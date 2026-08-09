@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Resume Feedback Tool</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; background: #f7f7f8; color: #1a1a1a; }
+  h1 { font-size: 1.6em; }
+  textarea, input { width: 100%; box-sizing: border-box; padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; }
+  textarea { height: 220px; margin-top: 10px; }
+  button { margin-top: 14px; padding: 10px 20px; background: #d97757; color: white; border: none; border-radius: 6px; font-size: 15px; cursor: pointer; }
+  button:disabled { background: #ccc; }
+  #result { margin-top: 30px; }
+  .card { background: white; padding: 16px 20px; border-radius: 8px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .score { font-size: 2em; font-weight: bold; color: #d97757; }
+  ul { margin: 6px 0 0 20px; padding: 0; }
+  .error { color: #b00020; }
+</style>
+</head>
+<body>
+  <h1>📄 Resume Feedback Tool</h1>
+  <p>Paste your resume below and get instant, structured AI feedback.</p>
+
+  <label>Target job title (optional)</label>
+  <input id="targetRole" placeholder="e.g. Software Engineer, Marketing Manager" />
+
+  <label>Resume text</label>
+  <textarea id="resumeText" placeholder="Paste your resume text here..."></textarea>
+
+  <button id="submitBtn" onclick="analyze()">Get Feedback</button>
+
+  <div id="result"></div>
+
+<script>
+async function analyze() {
+  const resumeText = document.getElementById('resumeText').value;
+  const targetRole = document.getElementById('targetRole').value;
+  const btn = document.getElementById('submitBtn');
+  const resultDiv = document.getElementById('result');
+
+  btn.disabled = true;
+  btn.textContent = "Analyzing...";
+  resultDiv.innerHTML = "";
+
+  try {
+    const res = await fetch('/analyze', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({resume_text: resumeText, target_role: targetRole})
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      resultDiv.innerHTML = `<p class="error">${data.error}</p>`;
+    } else {
+      resultDiv.innerHTML = `
+        <div class="card">
+          <div class="score">${data.overall_score} / 100</div>
+          <div>Overall Score</div>
+        </div>
+        <div class="card">
+          <strong>Rewritten Summary</strong>
+          <p>${data.rewritten_summary}</p>
+        </div>
+        <div class="card">
+          <strong>Strengths</strong>
+          <ul>${data.strengths.map(s => `<li>${s}</li>`).join('')}</ul>
+        </div>
+        <div class="card">
+          <strong>Weaknesses</strong>
+          <ul>${data.weaknesses.map(s => `<li>${s}</li>`).join('')}</ul>
+        </div>
+        <div class="card">
+          <strong>Suggestions</strong>
+          <ul>${data.suggestions.map(s => `<li>${s}</li>`).join('')}</ul>
+        </div>
+      `;
+    }
+  } catch (e) {
+    resultDiv.innerHTML = `<p class="error">Request failed: ${e.message}</p>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = "Get Feedback";
+}
+</script>
+</body>
+</html>
