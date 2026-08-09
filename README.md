@@ -8,7 +8,7 @@
 
 ## 📌 Overview
 
-**Resume Feedback Tool** is a lightweight, full-stack AI application that gives job seekers instant, structured feedback on their resumes — the kind of feedback you'd normally pay a career coach for.
+**Resume Feedback Tool** is a lightweight, An AI application that gives job seekers instant, structured feedback on their resumes — the kind of feedback you'd normally pay a career coach for.
 
 Instead of returning a vague paragraph of generic advice, the app enforces a **strict structured JSON schema** on the LLM's output, which is then rendered into clean, scannable cards on the frontend: an overall score, strengths, weaknesses, actionable suggestions, and a rewritten professional summary.
 
